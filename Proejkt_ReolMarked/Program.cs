@@ -146,4 +146,4 @@ class Program
         ctx.SaveChanges();
         Console.WriteLine("Reol slettet!");
     }
-}
+} //testing
