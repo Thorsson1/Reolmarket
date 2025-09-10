@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projekt_ReolMarked", "Proejkt_ReolMarked\Projekt_ReolMarked.csproj", "{0CAE0FE7-AD20-4773-88F4-02DA40BCD736}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0CAE0FE7-AD20-4773-88F4-02DA40BCD736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CAE0FE7-AD20-4773-88F4-02DA40BCD736}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CAE0FE7-AD20-4773-88F4-02DA40BCD736}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CAE0FE7-AD20-4773-88F4-02DA40BCD736}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C656014-3913-47A7-B9F6-B28E77EF84A8}
+	EndGlobalSection
+EndGlobal
