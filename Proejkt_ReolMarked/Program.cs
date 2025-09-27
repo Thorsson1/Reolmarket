@@ -14,7 +14,7 @@ class Program
         bool kører = true;
         while (kører)
         {
-            Console.WriteLine("\n--- ReolMarked Menu ---");
+            Console.WriteLine("Velkommen til ReolMarked");
             Console.WriteLine("1. Vis alle reoler");
             Console.WriteLine("2. Tilføj reol");
             Console.WriteLine("3. Rediger reol");
@@ -24,122 +24,150 @@ class Program
             Console.WriteLine("7. Rediger produkt");
             Console.WriteLine("8. Slet produkt");
             Console.WriteLine("9. Afslut");
-            Console.Write("Vælg handling: ");
+            Console.Write("Vælg en handling (1-9): ");
             string valg = Console.ReadLine() ?? "";
 
             switch (valg)
             {
-                case "1": VisReolListe(reolRepo); break;
+                case "1": VisReoler(reolRepo); break;
                 case "2": TilføjReol(reolRepo); break;
                 case "3": RedigerReol(reolRepo); break;
                 case "4": SletReol(reolRepo); break;
-                case "5": VisProduktListe(productRepo); break;
+                case "5": VisProdukter(productRepo); break;
                 case "6": TilføjProdukt(productRepo); break;
                 case "7": RedigerProdukt(productRepo); break;
                 case "8": SletProdukt(productRepo); break;
-                case "9": kører = false; break;
-                default: Console.WriteLine("Ugyldigt valg!"); break;
+                case "9":
+                    Console.WriteLine("Program afsluttet");
+                    kører = false;
+                    break;
+                default:
+                    Console.WriteLine("Ugyldigt valg");
+                    break;
             }
+
+            Console.WriteLine();
         }
     }
 
-    static void VisReolListe(IReolRepository repo)
+    static string LæsInput(string prompt, string? standard = null)
+    {
+        Console.Write(prompt);
+        string? input = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(input))
+            return standard ?? "";
+        return input;
+    }
+
+    static decimal LæsDecimal(string prompt, decimal standard = 0)
+    {
+        Console.Write(prompt);
+        string? input = Console.ReadLine();
+        return decimal.TryParse(input, out var værdi) ? værdi : standard;
+    }
+
+    // --- Reoler ---
+    static void VisReoler(IReolRepository repo)
     {
         var reoler = repo.GetAll();
-        Console.WriteLine("\n--- Alle Reoler ---");
+        Console.WriteLine("Alle reoler");
         foreach (var r in reoler)
-            Console.WriteLine($"ID: {r.ReolId} | Nr: {r.ReolNummer} | Status: {r.Status} | Pris: {r.Pris} | Type: {r.ReolType} | Lejer: {r.ReolLejer ?? "Ingen"} | Placering: {r.Placering}");
+        {
+            string lejer = string.IsNullOrEmpty(r.ReolLejer) ? "Ingen" : r.ReolLejer;
+            Console.WriteLine($"ID: {r.ReolId} | Nr: {r.ReolNummer} | Status: {r.Status} | Pris: {r.Pris:C} | Type: {r.ReolType} | Lejer: {lejer} | Placering: {r.Placering}");
+        }
     }
 
     static void TilføjReol(IReolRepository repo)
     {
-        var nyReol = new Reol();
-        Console.Write("ReolNummer: "); nyReol.ReolNummer = Console.ReadLine() ?? "";
-        Console.Write("Placering: "); nyReol.Placering = Console.ReadLine() ?? "";
-        Console.Write("Status: "); nyReol.Status = Console.ReadLine() ?? "Ledig";
-        Console.Write("ReolType: "); nyReol.ReolType = Console.ReadLine() ?? "";
-        Console.Write("Pris: "); nyReol.Pris = decimal.TryParse(Console.ReadLine(), out var pris) ? pris : 0;
-        Console.Write("ReolLejer (kan være tom): "); nyReol.ReolLejer = string.IsNullOrWhiteSpace(Console.ReadLine()) ? null : Console.ReadLine();
+        var nyReol = new Reol
+        {
+            ReolNummer = LæsInput("Reolnummer: "),
+            Placering = LæsInput("Placering: "),
+            Status = LæsInput("Status (standard 'Ledig'): ", "Ledig"),
+            ReolType = LæsInput("Reoltype: "),
+            Pris = LæsDecimal("Pris: "),
+            ReolLejer = LæsInput("Lejer (kan være tom): ", null)
+        };
 
         repo.Add(nyReol);
         repo.Save();
-        Console.WriteLine("Ny reol oprettet!");
+        Console.WriteLine("Reol oprettet");
     }
 
     static void RedigerReol(IReolRepository repo)
     {
-        Console.Write("Indtast ReolId på reolen du vil redigere: ");
-        if (!int.TryParse(Console.ReadLine(), out var id)) return;
-
+        int id = int.Parse(LæsInput("Indtast ReolId på reolen du vil redigere: "));
         var reol = repo.GetById(id);
-        if (reol == null) { Console.WriteLine("Reol ikke fundet!"); return; }
+        if (reol == null) { Console.WriteLine("Reol ikke fundet"); return; }
 
-        Console.Write($"ReolNummer ({reol.ReolNummer}): "); var input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) reol.ReolNummer = input;
-        Console.Write($"Placering ({reol.Placering}): "); input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) reol.Placering = input;
-        Console.Write($"Status ({reol.Status}): "); input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) reol.Status = input;
-        Console.Write($"ReolType ({reol.ReolType}): "); input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) reol.ReolType = input;
-        Console.Write($"Pris ({reol.Pris}): "); input = Console.ReadLine(); if (decimal.TryParse(input, out var pris)) reol.Pris = pris;
-        Console.Write($"ReolLejer ({reol.ReolLejer ?? "Ingen"}): "); input = Console.ReadLine(); reol.ReolLejer = string.IsNullOrWhiteSpace(input) ? null : input;
+        reol.ReolNummer = LæsInput($"Reolnummer ({reol.ReolNummer}): ", reol.ReolNummer);
+        reol.Placering = LæsInput($"Placering ({reol.Placering}): ", reol.Placering);
+        reol.Status = LæsInput($"Status ({reol.Status}): ", reol.Status);
+        reol.ReolType = LæsInput($"Reoltype ({reol.ReolType}): ", reol.ReolType);
+        reol.Pris = LæsDecimal($"Pris ({reol.Pris}): ", reol.Pris);
+        reol.ReolLejer = LæsInput($"Lejer ({reol.ReolLejer ?? "Ingen"}): ", reol.ReolLejer);
 
         repo.Update(reol);
         repo.Save();
-        Console.WriteLine("Reol opdateret!");
+        Console.WriteLine("Reol opdateret");
     }
 
     static void SletReol(IReolRepository repo)
     {
-        Console.Write("Indtast ReolId på reolen du vil slette: ");
-        if (!int.TryParse(Console.ReadLine(), out var id)) return;
+        int id = int.Parse(LæsInput("Indtast ReolId på reolen du vil slette: "));
         repo.Delete(id);
         repo.Save();
-        Console.WriteLine("Reol slettet!");
+        Console.WriteLine("Reol slettet");
     }
 
-    static void VisProduktListe(IProductRepository repo)
+    // --- Produkter ---
+    static void VisProdukter(IProductRepository repo)
     {
         var produkter = repo.GetAll();
-        Console.WriteLine("\n- Alle Produkter -");
+        Console.WriteLine("Alle produkter");
         foreach (var p in produkter)
-            Console.WriteLine($"ID: {p.ProductId} | Beskrivelse: {p.Beskrivelse} | Pris: {p.Pris} | Kommission: {p.Kommission} | ReolNr: {p.ReolNummer}");
+        {
+            Console.WriteLine($"ID: {p.ProductId} | {p.Beskrivelse} | Pris: {p.Pris:C} | Kommission: {p.Kommission:C} | Reol: {p.ReolNummer}");
+        }
     }
 
     static void TilføjProdukt(IProductRepository repo)
     {
-        var produkt = new Product();
-        Console.Write("Beskrivelse: "); produkt.Beskrivelse = Console.ReadLine() ?? "";
-        Console.Write("Pris: "); produkt.Pris = decimal.TryParse(Console.ReadLine(), out var pris) ? pris : 0;
-        Console.Write("Kommission: "); produkt.Kommission = decimal.TryParse(Console.ReadLine(), out var kom) ? kom : 0;
-        Console.Write("ReolNummer: "); produkt.ReolNummer = Console.ReadLine() ?? "";
+        var produkt = new Product
+        {
+            Beskrivelse = LæsInput("Beskrivelse: "),
+            Pris = LæsDecimal("Pris: "),
+            Kommission = LæsDecimal("Kommission: "),
+            ReolNummer = LæsInput("Reolnummer: ")
+        };
 
         repo.Add(produkt);
         repo.Save();
-        Console.WriteLine("Produkt oprettet!");
+        Console.WriteLine("Produkt oprettet");
     }
 
     static void RedigerProdukt(IProductRepository repo)
     {
-        Console.Write("Indtast ProductId på produktet du vil redigere: ");
-        if (!int.TryParse(Console.ReadLine(), out var id)) return;
-
+        int id = int.Parse(LæsInput("Indtast ProductId på produktet du vil redigere: "));
         var produkt = repo.GetById(id);
-        if (produkt == null) { Console.WriteLine("Produkt ikke fundet!"); return; }
+        if (produkt == null) { Console.WriteLine("Produkt ikke fundet"); return; }
 
-        Console.Write($"Beskrivelse ({produkt.Beskrivelse}): "); var input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) produkt.Beskrivelse = input;
-        Console.Write($"Pris ({produkt.Pris}): "); input = Console.ReadLine(); if (decimal.TryParse(input, out var pris)) produkt.Pris = pris;
-        Console.Write($"Kommission ({produkt.Kommission}): "); input = Console.ReadLine(); if (decimal.TryParse(input, out var kom)) produkt.Kommission = kom;
-        Console.Write($"ReolNummer ({produkt.ReolNummer}): "); input = Console.ReadLine(); if (!string.IsNullOrWhiteSpace(input)) produkt.ReolNummer = input;
+        produkt.Beskrivelse = LæsInput($"Beskrivelse ({produkt.Beskrivelse}): ", produkt.Beskrivelse);
+        produkt.Pris = LæsDecimal($"Pris ({produkt.Pris}): ", produkt.Pris);
+        produkt.Kommission = LæsDecimal($"Kommission ({produkt.Kommission}): ", produkt.Kommission);
+        produkt.ReolNummer = LæsInput($"Reolnummer ({produkt.ReolNummer}): ", produkt.ReolNummer);
 
         repo.Update(produkt);
         repo.Save();
-        Console.WriteLine("Produkt opdateres");
+        Console.WriteLine("Produkt opdateret");
     }
 
     static void SletProdukt(IProductRepository repo)
     {
-        Console.Write("Indtast ProductId på produktet du vil slette: ");
-        if (!int.TryParse(Console.ReadLine(), out var id)) return;
+        int id = int.Parse(LæsInput("Indtast ProductId på produktet du vil slette: "));
         repo.Delete(id);
         repo.Save();
-        Console.WriteLine("Produkt slettet!");
+        Console.WriteLine("Produkt slettet");
     }
 }
