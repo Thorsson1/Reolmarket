@@ -1,4 +1,4 @@
-﻿namespace ReolMarked.Models;
+namespace ReolMarked.Models;
 
 public class Reol
 {
