@@ -7,6 +7,8 @@ public class ReolMarkedContext : DbContext
 {
     public DbSet<Reol> Reoler { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Lejer> Lejere { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
